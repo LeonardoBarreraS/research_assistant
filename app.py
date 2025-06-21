@@ -62,15 +62,20 @@ def display_analysts_and_request_feedback(result):
             feedback_prompt, 
             gr.update(visible=True, value=""),
             gr.update(visible=True),
+            gr.update(visible=True),
             gr.update(visible=False),
             gr.update(visible=True)  # reset_btn   
             )
     
     else:
-            return reset_to_start(result, "❌ No analysts generated. Please try again with a different topic.")
+            return reset_to_start(result, "❌ No Analysts generated. Please try again with a different topic.")
 
 
-def continue_with_feedback(feedback):
+def continue_with_feedback(feedback, button_clicked):
+
+
+    if button_clicked == "research":
+        feedback= "approve"
 
     try:
         thread = {"configurable": {"thread_id": thread_id}}
@@ -85,9 +90,6 @@ def continue_with_feedback(feedback):
        
 
         state= compiled_graph.get_state(thread)
-
-        print(state.next)
-        print("hola esto es una prueba")
 
         if state.next and state.next[0] == "human_feedback":
              return display_analysts_and_request_feedback(result)
@@ -109,6 +111,7 @@ def display_final_report(result):
                 gr.update(visible=False),  # feedback_input
                 gr.update(visible=False),  # continue_btn
                 gr.update(visible=False),
+                gr.update(visible=False),
                 gr.update(visible=True)   
             )
         else:
@@ -123,7 +126,10 @@ def reset_to_start(result, message=""):
         message,
         gr.update(visible=False, value=""),  # feedback_input
         gr.update(visible=False),  # continue_btn
-        gr.update(visible=False)    # start_btn
+        gr.update(visible=False),
+        gr.update(visible=False),
+        gr.update(visible=False)
+                # start_btn
     )
 
 def reset_interface():
@@ -132,6 +138,7 @@ def reset_interface():
         "",  # output1
         gr.update(visible=False, value=""),  # feedback_input
         gr.update(visible=False),  # continue_btn
+        gr.update(visible=False),  # continue_research_btn
         gr.update(visible=True),   # start_btn
         gr.update(visible=True, value=""),  # topic
         gr.update(visible=True)    # max_analysts
@@ -141,9 +148,9 @@ def reset_interface():
 with gr.Blocks(title="Research Assistant", theme=gr.themes.Soft()) as app:
     gr.Markdown("<h1 style='font-size:2.8em; margin-bottom: 0.2em;'>🤖 Research Assistant</h1>")
     gr.Markdown("Assistant for researching complex topics. Process:\n"
-    "1. Provide a research topic and the maximum number of analysts.\n"
-    "2. The assistant will generate a summary of the analysts and their roles in the research.\n"
-    "3. Provide feedback on the topics and the generated analysts.\n"
+    "1. Provide a research topic and the maximum number of analysts, who will research different subtopics related to your topic.\n"
+    "2. The assistant will generate a summary of the analysts and their roles and subtopics in the research.\n"
+    "3. Provide feedback on the subtopics and the generated analysts.\n"
     "4. If you agree with the analysts, type 'approve' in the feedback field.\n"
     "5. The assistant will generate a final research report.\n\n")
 
@@ -158,14 +165,17 @@ with gr.Blocks(title="Research Assistant", theme=gr.themes.Soft()) as app:
         with gr.Column(scale=3):
             gr.Markdown("#**Provide Feedback on the Analysts who will perform the research. If you want to approve the analysts, type 'approve' in the feedback box.")
             feedback_input = gr.Textbox(label="Feedback", placeholder="Provide your feedback or type 'approve' to continue", visible=False, value="")
-            continue_btn = gr.Button("✅ Continue with Feedback", variant="primary", visible=False)
+            
         with gr.Column(scale=1):
             reset_btn = gr.Button("🔄 Reset", variant="secondary", visible=False)
 
-    with gr.Row():        
+    with gr.Row():
+        with gr.Column(scale=1):
             start_button = gr.Button("🚀 Start Research", variant="primary", visible=True)
-            # reset_btn = gr.Button("🔄 New Research", variant="secondary")  
-    
+            continue_feedback_btn = gr.Button("✅ Re-generate Analysts with Feedback", variant="primary", visible=False)
+        with gr.Column(scale=1):
+            continue_research_btn = gr.Button("➡️ Create Research with Analysts", variant="primary", visible=False)
+
 
 
     output1=gr.Markdown(label="Analysts Summary", value="")
@@ -177,18 +187,26 @@ with gr.Blocks(title="Research Assistant", theme=gr.themes.Soft()) as app:
     start_button.click(
         fn=start_research,
         inputs=[topic_textbox, max_analysts_slider],
-        outputs=[output1, feedback_input, continue_btn, start_button, reset_btn]
+        outputs=[output1, feedback_input, continue_feedback_btn, continue_research_btn, start_button, reset_btn]
     )
 
-    continue_btn.click(
-        fn=continue_with_feedback,
+
+    continue_feedback_btn.click(
+        fn=lambda feedback: continue_with_feedback(feedback, "feedback"),
         inputs=[feedback_input],
-        outputs=[output1, feedback_input, continue_btn, start_button, reset_btn]
+        outputs=[output1, feedback_input, continue_feedback_btn, continue_research_btn, start_button, reset_btn]
     )
+
+    continue_research_btn.click(
+        fn=lambda feedback: continue_with_feedback(feedback, "research"),
+        inputs=[feedback_input],
+        outputs=[output1, feedback_input, continue_feedback_btn, continue_research_btn, start_button, reset_btn]
+    )
+
 
     reset_btn.click(
         reset_interface,
-        outputs=[output1, feedback_input, continue_btn, start_button, topic_textbox, max_analysts_slider]
+        outputs=[output1, feedback_input, continue_feedback_btn, continue_research_btn, start_button, topic_textbox, max_analysts_slider]
     )
 
 #################################################################################################################################

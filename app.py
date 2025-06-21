@@ -50,7 +50,7 @@ def display_analysts_and_request_feedback(result):
         ])
 
         feedback_prompt = (
-            f"## Analysts Generated for: '{result["topic"]}'\n\n"
+            f"## Analysts Generated for: '{result['topic']}'\n\n"
             f"{analysts_display}\n\n"
             f"**Please provide your feedback:**\n"
             f"- Type 'approve' to continue with these analysts\n"

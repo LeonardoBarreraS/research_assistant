@@ -151,7 +151,7 @@ with gr.Blocks(title="Research Assistant", theme=gr.themes.Soft()) as app:
     "1. Provide a research topic and the maximum number of analysts, who will research different subtopics related to your topic.\n"
     "2. The assistant will generate a summary of the analysts and their roles and subtopics in the research.\n"
     "3. Provide feedback on the subtopics and the generated analysts.\n"
-    "4. If you agree with the analysts, type 'approve' in the feedback field.\n"
+    "4. If you agree with the analysts, click on the 'Create Research with Analysts' button \n"
     "5. The assistant will generate a final research report.\n\n")
 
     with gr.Row():
@@ -163,8 +163,8 @@ with gr.Blocks(title="Research Assistant", theme=gr.themes.Soft()) as app:
 
     with gr.Row():
         with gr.Column(scale=3):
-            gr.Markdown("#**Provide Feedback on the Analysts who will perform the research. If you want to approve the analysts, type 'approve' in the feedback box.")
-            feedback_input = gr.Textbox(label="Feedback", placeholder="Provide your feedback or type 'approve' to continue", visible=False, value="")
+            gr.Markdown("#Provide Feedback on the Analysts who will perform the research. If you agree with the analysts, click on the 'Create Research with Analysts' button")
+            feedback_input = gr.Textbox(label="Feedback", placeholder="Provide your feedback or click on the 'Create Research with Analysts' button", visible=False, value="")
             
         with gr.Column(scale=1):
             reset_btn = gr.Button("🔄 Reset", variant="secondary", visible=False)
